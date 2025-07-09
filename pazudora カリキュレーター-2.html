@@ -81,24 +81,25 @@
 
     <script>
         // JSONファイルからデータを取得する関数
-        async function fetchDungeonData() {
-            const response = await fetch('dungeonData.json');
-            if (!response.ok) {
-                alert('ダンジョンデータの読み込みに失敗しました。');
-                return {};
-            }
-            const data = await response.json();
-            // 文字列の割合を数値配列に変換
-            for (const dungeon in data) {
-                for (const floor in data[dungeon]) {
-                    data[dungeon][floor] = data[dungeon][floor]
-                        .split(',')
-                        .map(s => parseFloat(s.replace('%', '').trim()))
-                        .filter(v => !isNaN(v));
-                }
-            }
-            return data;
+        // ...既存コード...
+async function fetchDungeonData() {
+    const response = await fetch('https://raw.githubusercontent.com/flanlily/pazu-cal/main/dungeonData.json');
+    if (!response.ok) {
+        alert('ダンジョンデータの読み込みに失敗しました。');
+        return {};
+    }
+    const data = await response.json();
+    // 文字列の割合を数値配列に変換
+    for (const dungeon in data) {
+        for (const floor in data[dungeon]) {
+            data[dungeon][floor] = data[dungeon][floor]
+                .split(',')
+                .map(s => parseFloat(s.replace('%', '').trim()))
+                .filter(v => !isNaN(v));
         }
+    }
+    return data;
+}
 
         // HTML要素の取得
         const dungeonSelect = document.getElementById('dungeonSelect');
