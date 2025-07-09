@@ -84,7 +84,7 @@
         async function fetchDungeonData() {
             // GitHub Pagesで公開する場合は、fetchのパスを相対パスにする
             // HTMLと同じ階層にdungeonData.jsonがある場合
-            const response = await fetch('dungeonData.json');
+            const response = await fetch('./dungeonData.json');
             if (!response.ok) {
                 alert('ダンジョンデータの読み込みに失敗しました。');
                 return {};
