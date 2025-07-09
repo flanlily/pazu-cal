@@ -1,0 +1,144 @@
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    margin: 0;
+    background: linear-gradient(135deg, #2196f3 0%, #1565c0 100%);
+    color: #fff;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.container {
+    max-width: 95vw;
+    width: 100%;
+    margin: 0 auto;
+    background: rgba(30, 60, 120, 0.92);
+    padding: 18px 8px 28px 8px;
+    border-radius: 16px;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.18);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+h1, h2 {
+    color: #e3f2fd;
+    border-bottom: 2px solid #1976d2;
+    padding-bottom: 8px;
+    margin-bottom: 18px;
+    width: 100%;
+    text-align: center;
+}
+p, label, .note {
+    color: #e3f2fd;
+}
+.input-group {
+    margin-bottom: 14px;
+    width: 100%;
+    max-width: 400px;
+}
+.input-group label {
+    display: block;
+    margin-bottom: 4px;
+    font-weight: bold;
+    color: #bbdefb;
+}
+.input-group select,
+.input-group input[type="number"] {
+    width: 100%;
+    padding: 10px;
+    border: 1.5px solid #64b5f6;
+    border-radius: 6px;
+    font-size: 17px;
+    background: rgba(255,255,255,0.93);
+    color: #0d47a1;
+    margin-bottom: 2px;
+    box-sizing: border-box;
+    outline: none;
+    transition: border-color 0.2s;
+}
+.input-group select:focus,
+.input-group input[type="number"]:focus {
+    border-color: #1976d2;
+}
+button {
+    background: linear-gradient(90deg, #1976d2 60%, #42a5f5 100%);
+    color: #fff;
+    padding: 13px 0;
+    border: none;
+    border-radius: 7px;
+    cursor: pointer;
+    font-size: 19px;
+    font-weight: bold;
+    transition: background 0.2s;
+    width: 100%;
+    max-width: 400px;
+    margin-top: 10px;
+    box-shadow: 0 2px 8px rgba(33,150,243,0.12);
+}
+button:hover {
+    background: linear-gradient(90deg, #1565c0 60%, #64b5f6 100%);
+}
+.results-table {
+    width: 100%;
+    max-width: 400px;
+    border-collapse: collapse;
+    margin-top: 18px;
+    background: rgba(255,255,255,0.97);
+    color: #0d47a1;
+    border-radius: 8px;
+    overflow: hidden;
+    font-size: 15px;
+}
+.results-table th, .results-table td {
+    border: 1px solid #90caf9;
+    padding: 8px;
+    text-align: center;
+}
+.results-table th {
+    background: #bbdefb;
+    color: #0d47a1;
+    font-weight: bold;
+}
+.results-table tr:nth-child(even) {
+    background: #e3f2fd;
+}
+.results-table .can-withstand {
+    color: #2e7d32;
+    font-weight: bold;
+}
+.results-table .cannot-withstand {
+    color: #c62828;
+    font-weight: bold;
+}
+.note {
+    font-size: 0.92em;
+    color: #b3e5fc;
+    margin-top: 18px;
+    border-top: 1px solid #1976d2;
+    padding-top: 12px;
+    width: 100%;
+    max-width: 400px;
+    text-align: left;
+    background: none;
+}
+@media (max-width: 600px) {
+    .container {
+        padding: 8px 2vw 18px 2vw;
+        border-radius: 0;
+        min-height: 100vh;
+        box-shadow: none;
+    }
+    h1, h2 {
+        font-size: 1.2em;
+        padding-bottom: 5px;
+        margin-bottom: 12px;
+    }
+    .input-group, .results-table, .note {
+        max-width: 98vw;
+        font-size: 1em;
+    }
+    button {
+        font-size: 1em;
+        padding: 11px 0;
+    }
+}

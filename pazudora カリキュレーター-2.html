@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ダメージ軽減計算ツール</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>ダメージ軽減計算ツール</h1>
+        <p>
+            Notebooklmを使用し作成したツールになります。<br>
+            ※NootbooklmはGoogleが提供するサービスです。
+        </p>
+
+        <div class="input-group">
+            <label for="dungeonSelect">ダンジョン選択:</label>
+            <select id="dungeonSelect">
+                <option value="">ダンジョンを選択してください</option>
+            </select>
+        </div>
+
+        <div class="input-group">
+            <label for="floorSelect">フロア選択:</label>
+            <select id="floorSelect" disabled>
+                <option value="">フロアを選択してください</option>
+            </select>
+        </div>
+
+        <div class="input-group">
+            <label for="inputA">リーダーキャラ軽減率 (A) <small>例: 0.5 (50%軽減) または 0.75 (75%軽減)</small>:</label>
+            <input type="number" id="inputA" min="0" max="1" step="0.01" value="0">
+        </div>
+
+        <div class="input-group">
+            <label for="inputB">助っ人軽減率 (B) <small>例: 0.5 (50%軽減) または 0.75 (75%軽減)</small>:</label>
+            <input type="number" id="inputB" min="0" max="1" step="0.01" value="0">
+        </div>
+
+        <div class="input-group">
+            <label for="inputC">軽減スキル (C):</label>
+            <select id="inputC">
+                <option value="0">0%</option>
+                <option value="0.3">30%</option>
+                <option value="0.35">35%</option>
+                <option value="0.4">40%</option>
+                <option value="0.5">50%</option>
+                <option value="0.6">60%</option>
+                <option value="0.7">70%</option>
+                <option value="0.75">75%</option>
+                <option value="0.8">80%</option>
+                <option value="0.9">90%</option>
+                <option value="1">100% (完全無効)</option>
+            </select>
+        </div>
+
+        <button id="calculateButton">計算する</button>
+
+        <div id="results">
+            <h2>計算結果</h2>
+            <p id="totalReductionRate"></p>
+            <table class="results-table" id="resultsTable">
+                <thead>
+                    <tr>
+                        <th>フロアの割合ダメージ</th>
+                        <th>最終的なHPに対するダメージ割合</th>
+                        <th>耐えれるか</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- 結果はここにJavaScriptで挿入されます -->
+                </tbody>
+            </table>
+        </div>
+
+        <p class="note">
+            ※一個人が趣味範囲で作成したツールになります。<br>
+        </p>
+    </div>
+
+    <script>
+        // JSONファイルからデータを取得する関数
+        async function fetchDungeonData() {
+            const response = await fetch('dungeonData.json');
+            if (!response.ok) {
+                alert('ダンジョンデータの読み込みに失敗しました。');
+                return {};
+            }
+            const data = await response.json();
+            // 文字列の割合を数値配列に変換
+            for (const dungeon in data) {
+                for (const floor in data[dungeon]) {
+                    data[dungeon][floor] = data[dungeon][floor]
+                        .split(',')
+                        .map(s => parseFloat(s.replace('%', '').trim()))
+                        .filter(v => !isNaN(v));
+                }
+            }
+            return data;
+        }
+
+        // HTML要素の取得
+        const dungeonSelect = document.getElementById('dungeonSelect');
+        const floorSelect = document.getElementById('floorSelect');
+        const inputA = document.getElementById('inputA');
+        const inputB = document.getElementById('inputB');
+        const inputC = document.getElementById('inputC');
+        const calculateButton = document.getElementById('calculateButton');
+        const totalReductionRateDisplay = document.getElementById('totalReductionRate');
+        const resultsTableBody = document.querySelector('#resultsTable tbody');
+
+        let dungeonData = {};
+
+        // ページロード時にダンジョン選択肢を初期化する関数
+        function initializeDungeonSelect() {
+            dungeonSelect.innerHTML = '<option value="">ダンジョンを選択してください</option>';
+            for (const dungeonName in dungeonData) {
+                const option = document.createElement('option');
+                option.value = dungeonName;
+                option.textContent = dungeonName;
+                dungeonSelect.appendChild(option);
+            }
+        }
+
+        // ダンジョン選択時にフロア選択肢を更新するイベントリスナー
+        dungeonSelect.addEventListener('change', () => {
+            const selectedDungeon = dungeonSelect.value;
+            floorSelect.innerHTML = '<option value="">フロアを選択してください</option>';
+            floorSelect.disabled = true;
+
+            if (selectedDungeon && dungeonData[selectedDungeon]) {
+                const floors = dungeonData[selectedDungeon];
+                for (const floorName in floors) {
+                    const option = document.createElement('option');
+                    option.value = floorName;
+                    option.textContent = floorName;
+                    floorSelect.appendChild(option);
+                }
+                floorSelect.disabled = false;
+            }
+        });
+
+        // 計算ボタンがクリックされたときの処理
+        calculateButton.addEventListener('click', () => {
+            const selectedDungeon = dungeonSelect.value;
+            const selectedFloor = floorSelect.value;
+            const valA = parseFloat(inputA.value);
+            const valB = parseFloat(inputB.value);
+            const valC = parseFloat(inputC.value);
+
+            if (!selectedDungeon || !selectedFloor) {
+                alert('ダンジョンとフロアを選択してください。');
+                return;
+            }
+            if (isNaN(valA) || isNaN(valB)) {
+                alert('リーダーキャラ軽減率と助っ人軽減率は数値で入力してください。');
+                return;
+            }
+
+            const finalDamageMultiplier = (1 - valA) * (1 - valB) * (1 - valC);
+            const totalReduction = 1 - finalDamageMultiplier;
+
+            totalReductionRateDisplay.textContent = `入力された軽減率による最終的な被ダメージ倍率: ${(finalDamageMultiplier * 100).toFixed(2)}% （合計軽減率: ${(totalReduction * 100).toFixed(2)}%）`;
+
+            const floorPercentages = dungeonData[selectedDungeon][selectedFloor];
+
+            resultsTableBody.innerHTML = '';
+
+            floorPercentages.forEach(percentage => {
+                const actualDamageRatio = (percentage / 100) * finalDamageMultiplier;
+                const canWithstand = actualDamageRatio < 1;
+
+                const row = resultsTableBody.insertRow();
+                const cell1 = row.insertCell(0);
+                const cell2 = row.insertCell(1);
+                const cell3 = row.insertCell(2);
+
+                cell1.textContent = `${percentage}%`;
+                cell2.textContent = `${(actualDamageRatio * 100).toFixed(2)}%`;
+
+                if (canWithstand) {
+                    cell3.textContent = '耐えれる ✅';
+                    cell3.classList.add('can-withstand');
+                } else {
+                    cell3.textContent = '耐えれない ❌';
+                    cell3.classList.add('cannot-withstand');
+                }
+            });
+        });
+
+        // ページが完全に読み込まれた後にJSONを読み込んで初期化
+        window.addEventListener('DOMContentLoaded', async () => {
+            dungeonData = await fetchDungeonData();
+            initializeDungeonSelect();
+        });
+    </script>
+</body>
+</html>
