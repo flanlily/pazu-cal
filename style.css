@@ -93,6 +93,7 @@ button:hover {
     border: 1px solid #90caf9;
     padding: 8px;
     text-align: center;
+    word-break: break-all;
 }
 .results-table th {
     background: #bbdefb;
@@ -136,6 +137,10 @@ button:hover {
     .input-group, .results-table, .note {
         max-width: 98vw;
         font-size: 1em;
+    }
+    .results-table th, .results-table td {
+        font-size: 0.95em;
+        padding: 6px;
     }
     button {
         font-size: 1em;
