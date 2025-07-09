@@ -83,7 +83,7 @@
         // JSONファイルからデータを取得する関数
         // ...既存コード...
 async function fetchDungeonData() {
-    const response = await fetch('https://raw.githubusercontent.com/flanlily/pazu-cal/main/dungeonData.json');
+    const response = await fetch('dungeonData.json');
     if (!response.ok) {
         alert('ダンジョンデータの読み込みに失敗しました。');
         return {};
