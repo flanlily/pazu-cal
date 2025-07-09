@@ -81,25 +81,29 @@
 
     <script>
         // JSONファイルからデータを取得する関数
-        // ...既存コード...
-async function fetchDungeonData() {
-    const response = await fetch('dungeonData.json');
-    if (!response.ok) {
-        alert('ダンジョンデータの読み込みに失敗しました。');
-        return {};
-    }
-    const data = await response.json();
-    // 文字列の割合を数値配列に変換
-    for (const dungeon in data) {
-        for (const floor in data[dungeon]) {
-            data[dungeon][floor] = data[dungeon][floor]
-                .split(',')
-                .map(s => parseFloat(s.replace('%', '').trim()))
-                .filter(v => !isNaN(v));
+        async function fetchDungeonData() {
+            // GitHub Pagesで公開する場合は、fetchのパスを相対パスにする
+            // HTMLと同じ階層にdungeonData.jsonがある場合
+            const response = await fetch('dungeonData.json');
+            if (!response.ok) {
+                alert('ダンジョンデータの読み込みに失敗しました。');
+                return {};
+            }
+            const data = await response.json();
+            // 文字列の割合を数値配列に変換
+            for (const dungeon in data) {
+                for (const floor in data[dungeon]) {
+                    // もし値が配列でなく文字列なら分割
+                    if (typeof data[dungeon][floor] === 'string') {
+                        data[dungeon][floor] = data[dungeon][floor]
+                            .split(',')
+                            .map(s => parseFloat(s.replace('%', '').trim()))
+                            .filter(v => !isNaN(v));
+                    }
+                }
+            }
+            return data;
         }
-    }
-    return data;
-}
 
         // HTML要素の取得
         const dungeonSelect = document.getElementById('dungeonSelect');
