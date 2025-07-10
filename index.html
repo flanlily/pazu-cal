@@ -200,5 +200,26 @@
             initializeDungeonSelect();
         });
     </script>
+
+    <hr>
+    <h2>JSON Auto Reload Example</h2>
+    <pre id="jsonDisplay"></pre>
+    <script>
+      async function fetchAndUpdate() {
+        try {
+          const res = await fetch('dungeonData.json', {cache: "no-store"});
+          if (!res.ok) {
+            document.getElementById('jsonDisplay').textContent = 'dungeonData.jsonの取得に失敗しました';
+            return;
+          }
+          const text = await res.text();
+          document.getElementById('jsonDisplay').textContent = text;
+        } catch (e) {
+          document.getElementById('jsonDisplay').textContent = 'エラー: ' + e;
+        }
+      }
+      setInterval(fetchAndUpdate, 2000); // 2秒ごとにチェック
+      fetchAndUpdate();
+    </script>
 </body>
 </html>
