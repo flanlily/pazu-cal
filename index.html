@@ -3,6 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="manifest" href="manifest.json">
+    <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+    <meta name="theme-color" content="#1976d2">
     <title>ダメージ軽減計算ツール</title>
     <link rel="stylesheet" href="style.css">
 </head>
@@ -201,6 +204,10 @@
             dungeonData = await fetchDungeonData();
             initializeDungeonSelect();
         });
+
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('./sw.js');
+        }
     </script>
 </body>
 </html>
