@@ -96,6 +96,20 @@
     </div>
 
     <script>
+        // ページリロード時にクッキーとローカルストレージを削除
+        window.addEventListener('load', () => {
+            // クッキー削除
+            document.cookie.split(';').forEach(function(c) {
+                const eqPos = c.indexOf('=');
+                const name = eqPos > -1 ? c.substr(0, eqPos) : c;
+                document.cookie = name + '=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/';
+            });
+            // ローカルストレージ削除
+            localStorage.clear();
+            // セッションストレージ削除
+            sessionStorage.clear();
+        });
+
         // JSONファイルからデータを取得する関数
         async function fetchDungeonData() {
             // GitHub Pagesで公開する場合は、fetchのパスを相対パスにする
