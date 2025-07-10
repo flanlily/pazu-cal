@@ -60,6 +60,16 @@
             </select>
         </div>
 
+        <div class="input-group">
+            <label for="inputL">回復L字消し個数（1個5%軽減、最大6個まで）:</label>
+            <input type="number" id="inputL" min="0" max="6" step="1" value="0">
+        </div>
+
+        <div class="input-group">
+            <label for="inputAttr">属性軽減+個数（1個2.5%軽減、最大10個まで）:</label>
+            <input type="number" id="inputAttr" min="0" max="10" step="1" value="0">
+        </div>
+
         <button id="calculateButton">計算する</button>
 
         <div id="results">
@@ -116,6 +126,8 @@
         const inputA = document.getElementById('inputA');
         const inputB = document.getElementById('inputB');
         const inputC = document.getElementById('inputC');
+        const inputL = document.getElementById('inputL'); // 回復L字
+        const inputAttr = document.getElementById('inputAttr'); // 属性軽減+個数
         const calculateButton = document.getElementById('calculateButton');
         const totalReductionRateDisplay = document.getElementById('totalReductionRate');
         const resultsTableBody = document.querySelector('#resultsTable tbody');
@@ -158,6 +170,8 @@
             const valA = parseFloat(inputA.value);
             const valB = parseFloat(inputB.value);
             const valC = parseFloat(inputC.value);
+            const valL = parseInt(inputL.value) || 0; // L字個数
+            const valAttr = parseInt(inputAttr.value) || 0; // 属性軽減+個数
 
             if (!selectedDungeon || !selectedFloor) {
                 alert('ダンジョンとフロアを選択してください。');
@@ -167,11 +181,21 @@
                 alert('リーダーキャラ軽減率と助っ人軽減率は数値で入力してください。');
                 return;
             }
+            if (valL < 0 || valL > 6) {
+                alert('回復L字消し個数は0～6の範囲で入力してください。');
+                return;
+            }
+            if (valAttr < 0 || valAttr > 10) {
+                alert('属性軽減+個数は0～10の範囲で入力してください。');
+                return;
+            }
 
-            const finalDamageMultiplier = (1 - valA) * (1 - valB) * (1 - valC);
+            const lReduction = Math.min(valL * 0.05, 0.3); // 最大30%
+            const attrReduction = Math.min(valAttr * 0.025, 0.25); // 最大25%
+            const finalDamageMultiplier = (1 - valA) * (1 - valB) * (1 - valC) * (1 - lReduction) * (1 - attrReduction);
             const totalReduction = 1 - finalDamageMultiplier;
 
-            totalReductionRateDisplay.textContent = `入力された軽減率による最終的な被ダメージ倍率: ${(finalDamageMultiplier * 100).toFixed(2)}% （合計軽減率: ${(totalReduction * 100).toFixed(2)}%）`;
+            totalReductionRateDisplay.textContent = `入力された軽減率による最終的な被ダメージ倍率: ${(finalDamageMultiplier * 100).toFixed(2)}% （合計軽減率: ${(totalReduction * 100).toFixed(2)}%）\n回復L字軽減率: ${(lReduction * 100).toFixed(0)}%　属性軽減+: ${(attrReduction * 100).toFixed(1)}%`;
 
             const floorPercentages = dungeonData[selectedDungeon][selectedFloor];
 
