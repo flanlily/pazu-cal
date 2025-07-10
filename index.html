@@ -16,8 +16,7 @@
             Notebooklmを使用し作成したツールになります。<br>
             ※NootbooklmはGoogleが提供するサービスです。<br>
             
-            7/10追記: 一部ダンジョン追加しました。<br>
-            7/10追記: 回復L消し軽減, 属性軽減+に対応しました。
+            7/10追記: 一部ダンジョン追加しました。
         </p>
 
         <div class="input-group">
@@ -69,8 +68,6 @@
             <label for="inputAttr">属性軽減+個数（1個2.5%軽減、制限なし）:</label>
             <input type="number" id="inputAttr" min="0" step="1" value="0">
         </div>
-
-        <button id="calculateButton">計算する</button>
 
         <div id="results">
             <h2>計算結果</h2>
@@ -128,7 +125,6 @@
         const inputC = document.getElementById('inputC');
         const inputL = document.getElementById('inputL'); // 回復L字
         const inputAttr = document.getElementById('inputAttr'); // 属性軽減+個数
-        const calculateButton = document.getElementById('calculateButton');
         const totalReductionRateDisplay = document.getElementById('totalReductionRate');
         const resultsTableBody = document.querySelector('#resultsTable tbody');
 
@@ -163,8 +159,8 @@
             }
         });
 
-        // 計算ボタンがクリックされたときの処理
-        calculateButton.addEventListener('click', () => {
+        // 計算処理本体を関数化
+        function runCalculation() {
             const selectedDungeon = dungeonSelect.value;
             const selectedFloor = floorSelect.value;
             const valA = parseFloat(inputA.value);
@@ -174,19 +170,23 @@
             const valAttr = parseInt(inputAttr.value) || 0; // 属性軽減+個数
 
             if (!selectedDungeon || !selectedFloor) {
-                alert('ダンジョンとフロアを選択してください。');
+                totalReductionRateDisplay.textContent = '';
+                resultsTableBody.innerHTML = '';
                 return;
             }
             if (isNaN(valA) || isNaN(valB)) {
-                alert('リーダーキャラ軽減率と助っ人軽減率は数値で入力してください。');
+                totalReductionRateDisplay.textContent = 'リーダーキャラ軽減率と助っ人軽減率は数値で入力してください。';
+                resultsTableBody.innerHTML = '';
                 return;
             }
             if (valL < 0) {
-                alert('回復L字消し個数は0以上で入力してください。');
+                totalReductionRateDisplay.textContent = '回復L字消し個数は0以上で入力してください。';
+                resultsTableBody.innerHTML = '';
                 return;
             }
             if (valAttr < 0) {
-                alert('属性軽減+個数は0以上で入力してください。');
+                totalReductionRateDisplay.textContent = '属性軽減+個数は0以上で入力してください。';
+                resultsTableBody.innerHTML = '';
                 return;
             }
 
@@ -221,12 +221,18 @@
                     cell3.classList.add('cannot-withstand');
                 }
             });
-        });
+        }
 
         // ページが完全に読み込まれた後にJSONを読み込んで初期化
         window.addEventListener('DOMContentLoaded', async () => {
             dungeonData = await fetchDungeonData();
             initializeDungeonSelect();
+        });
+
+        // 各入力欄・セレクトボックスの変更時に計算を実行
+        [dungeonSelect, floorSelect, inputA, inputB, inputC, inputL, inputAttr].forEach(el => {
+            el.addEventListener('input', runCalculation);
+            el.addEventListener('change', runCalculation);
         });
 
         if ('serviceWorker' in navigator) {
