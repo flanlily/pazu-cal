@@ -61,13 +61,12 @@
         </div>
 
         <div class="input-group">
-            <label for="inputL">回復L字消し個数（1個5%軽減、最大6個まで）:</label>
-            <input type="number" id="inputL" min="0" max="6" step="1" value="0">
+            <label for="inputL">回復L字消し個数（1個5%軽減、制限なし）:</label>
+            <input type="number" id="inputL" min="0" step="1" value="0">
         </div>
-
         <div class="input-group">
-            <label for="inputAttr">属性軽減+個数（1個2.5%軽減、最大10個まで）:</label>
-            <input type="number" id="inputAttr" min="0" max="10" step="1" value="0">
+            <label for="inputAttr">属性軽減+個数（1個2.5%軽減、制限なし）:</label>
+            <input type="number" id="inputAttr" min="0" step="1" value="0">
         </div>
 
         <button id="calculateButton">計算する</button>
@@ -181,17 +180,17 @@
                 alert('リーダーキャラ軽減率と助っ人軽減率は数値で入力してください。');
                 return;
             }
-            if (valL < 0 || valL > 6) {
-                alert('回復L字消し個数は0～6の範囲で入力してください。');
+            if (valL < 0) {
+                alert('回復L字消し個数は0以上で入力してください。');
                 return;
             }
-            if (valAttr < 0 || valAttr > 10) {
-                alert('属性軽減+個数は0～10の範囲で入力してください。');
+            if (valAttr < 0) {
+                alert('属性軽減+個数は0以上で入力してください。');
                 return;
             }
 
-            const lReduction = Math.min(valL * 0.05, 0.3); // 最大30%
-            const attrReduction = Math.min(valAttr * 0.025, 0.25); // 最大25%
+            const lReduction = valL * 0.05; // 制限なし
+            const attrReduction = valAttr * 0.025; // 制限なし
             const finalDamageMultiplier = (1 - valA) * (1 - valB) * (1 - valC) * (1 - lReduction) * (1 - attrReduction);
             const totalReduction = 1 - finalDamageMultiplier;
 
