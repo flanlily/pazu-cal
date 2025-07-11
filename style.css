@@ -152,14 +152,18 @@ button:focus {
 /* 追加：タブボタン */
 .tabs {
     display: flex;
-    justify-content: center;
-    margin-bottom: 20px;
-    flex-wrap: nowrap; /* 折り返さない */
+    justify-content: center; /* 中央寄せ */
     gap: 8px;
-    overflow-x: auto; /* 幅オーバー時に横スクロール */
+    flex-wrap: nowrap; /* 折り返さない */
+    overflow-x: hidden; /* 横スクロール禁止 */
+    max-width: 100vw;   /* 画面幅内に */
+    box-sizing: border-box;
+    padding: 0 12px;    /* 左右少し余白 */
 }
 
 .tab-button {
+    flex: 1 1 0;          /* 横に均等に伸ばす */
+    max-width: 200px;     /* 最大幅を適度に制限 */
     background: linear-gradient(90deg, #1976d2 60%, #42a5f5 100%);
     border: none;
     border-radius: 6px;
@@ -172,7 +176,7 @@ button:focus {
     user-select: none;
 
     white-space: nowrap; /* 文字折り返さない */
-    flex-shrink: 0;      /* ボタンの縮小禁止 */
+    /* flex-shrink: 0; 削除 */
 }
 
 .tab-button.active {
@@ -228,13 +232,14 @@ button:focus {
     }
     .tabs {
         gap: 6px;
+        padding: 0 6px; /* スマホは左右余白少し減らす */
     }
     .tab-button {
-        /* flex-grow: 1; 削除して文字が折り返されないように */
+        flex: 1 1 0;
+        max-width: 150px;
         padding: 10px 8px;
         font-size: 1rem;
-
-        white-space: nowrap; /* 追加 */
-        flex-shrink: 0;
+        white-space: nowrap;
+        user-select: none;
     }
 }
