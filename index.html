@@ -11,7 +11,20 @@
 <body>
     <div class="container">
         <h1>PDC非対応計算ツール</h1>
-
+  <p>
+            Notebooklmを使用し作成したツールになります。<br>
+            ※NootbooklmはGoogleが提供するサービスです。<br>
+            PDCと合わせてご利用ください。<br>
+            <br>
+            7/10追記:<br>
+                一部ダンジョン追加しました。<br>
+                回復L字消し軽減, 属性軽減+に対応しました。<br>
+                計算結果をリアルタイム反映するようにしました。
+            <br>
+            7/11追記:<br>
+                経験値計算に仮対応しました。<br>
+                不具合等あれば、<a href="https://x.com/sarna_flanlily" target="_blank" rel="noopener noreferrer"</a>までお願いします。
+        </p>
         <!-- タブボタン -->
         <div class="tabs">
             <button class="tab-button active" data-tab="damage">現在HP割合計算</button>
@@ -31,12 +44,12 @@
             </div>
 
             <div class="input-group">
-                <label for="inputA">リーダー軽減率 (A) 0〜1の小数で入力</label>
+                <label for="inputA">リーダー軽減率 (A) 0〜1の小数で入力（50%軽減→0.5 , 20%軽減→0.2）</label>
                 <input type="number" id="inputA" min="0" max="1" step="0.01" value="0" />
             </div>
 
             <div class="input-group">
-                <label for="inputB">助っ人軽減率 (B) 0〜1の小数で入力</label>
+                <label for="inputB">助っ人軽減率 (B) 0〜1の小数で入力（50%軽減→0.5 , 20%軽減→0.2）</label>
                 <input type="number" id="inputB" min="0" max="1" step="0.01" value="0" />
             </div>
 
