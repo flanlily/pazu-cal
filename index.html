@@ -88,13 +88,13 @@
             <h2>経験値計算</h2>
 
             <div class="input-group">
-                <label for="expCategory">カテゴリ選択:</label>
-                <select id="expCategory"></select>
+                <label for="expDungeon">ダンジョン選択:</label>
+                <select id="expDungeon"></select>
             </div>
 
             <div class="input-group">
-                <label for="expDungeon">ダンジョン選択:</label>
-                <select id="expDungeon" disabled></select>
+                <label for="expFloor">フロア選択:</label>
+                <select id="expFloor" disabled></select>
             </div>
 
             <div class="input-group">
@@ -187,8 +187,8 @@
         const totalReductionRateDisplay = document.getElementById('totalReductionRate');
         const resultsTableBody = document.querySelector('#resultsTable tbody');
 
-        const expCategory = document.getElementById('expCategory');
         const expDungeon = document.getElementById('expDungeon');
+        const expFloor = document.getElementById('expFloor');
         const leaderMultiplier = document.getElementById('leaderMultiplier');
         const friendMultiplier = document.getElementById('friendMultiplier');
         const dungeonBonusCount = document.getElementById('dungeonBonusCount');
@@ -324,51 +324,47 @@
         }
 
         // ----------- 経験値計算処理 -----------
-        function initializeExpCategorySelect() {
-            expCategory.innerHTML = '<option value="">カテゴリを選択してください</option>';
-            for (const category in expData) {
-                const option = document.createElement('option');
-                option.value = category;
-                option.textContent = category;
-                expCategory.appendChild(option);
-            }
+        function initializeExpDungeonSelect() {
             expDungeon.innerHTML = '<option value="">ダンジョンを選択してください</option>';
-            expDungeon.disabled = true;
+            expFloor.innerHTML = '<option value="">フロアを選択してください</option>';
+            expFloor.disabled = true;
+
+            for (const dungeon in expData) {
+                const option = document.createElement('option');
+                option.value = dungeon;
+                option.textContent = dungeon;
+                expDungeon.appendChild(option);
+            }
         }
 
-        expCategory.addEventListener('change', () => {
-            const selectedCategory = expCategory.value;
-            expDungeon.innerHTML = '<option value="">ダンジョンを選択してください</option>';
-            expDungeon.disabled = true;
+        expDungeon.addEventListener('change', () => {
+            const selectedDungeon = expDungeon.value;
+            expFloor.innerHTML = '<option value="">フロアを選択してください</option>';
+            expFloor.disabled = true;
             expValueDisplay.textContent = '-';
 
-            if (selectedCategory && expData[selectedCategory]) {
-                const dungeons = expData[selectedCategory];
-                for (const dungeonName in dungeons) {
+            if (selectedDungeon && expData[selectedDungeon]) {
+                const floors = expData[selectedDungeon];
+                for (const floor in floors) {
                     const option = document.createElement('option');
-                    option.value = dungeonName;
-                    option.textContent = dungeonName;
-                    expDungeon.appendChild(option);
+                    option.value = floor;
+                    option.textContent = floor;
+                    expFloor.appendChild(option);
                 }
-                expDungeon.disabled = false;
+                expFloor.disabled = false;
             }
             calculateExp();
         });
 
-        expDungeon.addEventListener('change', () => {
-            expValueDisplay.textContent = '-';
-            calculateExp();
-        });
-
+        expFloor.addEventListener('change', calculateExp);
         leaderMultiplier.addEventListener('input', calculateExp);
         friendMultiplier.addEventListener('input', calculateExp);
         dungeonBonusCount.addEventListener('input', calculateExp);
 
         function calculateExp() {
-            const category = expCategory.value;
             const dungeon = expDungeon.value;
+            const floor = expFloor.value;
 
-            // 倍率は1.0未満なら1.0固定にする
             let leaderMul = parseFloat(leaderMultiplier.value);
             if (isNaN(leaderMul) || leaderMul < 1) leaderMul = 1.0;
 
@@ -377,17 +373,18 @@
 
             const bonusCount = parseInt(dungeonBonusCount.value) || 0;
 
-            if (!category || !dungeon) {
+            if (!dungeon || !floor) {
                 expValueDisplay.textContent = '-';
                 return;
             }
 
             let baseExp;
 
-            if (Array.isArray(expData[category][dungeon])) {
-                baseExp = expData[category][dungeon].reduce((a, b) => a + b, 0);
-            } else if (typeof expData[category][dungeon] === 'number') {
-                baseExp = expData[category][dungeon];
+            // expData[dungeon][floor] は経験値数値か、配列の場合もある想定
+            if (Array.isArray(expData[dungeon][floor])) {
+                baseExp = expData[dungeon][floor].reduce((a, b) => a + b, 0);
+            } else if (typeof expData[dungeon][floor] === 'number') {
+                baseExp = expData[dungeon][floor];
             } else {
                 baseExp = 0;
             }
@@ -395,7 +392,6 @@
             // ダンジョンボーナス覚醒は1つにつき2%加算されて乗算
             const bonusMultiplier = Math.pow(1.02, bonusCount);
 
-            // 経験値倍率計算（切り捨て）
             let expResult = Math.floor(baseExp * leaderMul * friendMul * bonusMultiplier);
 
             expValueDisplay.textContent = `経験値: ${expResult.toLocaleString()}（ベース: ${baseExp.toLocaleString()}）`;
@@ -407,9 +403,8 @@
             initializeDamageDungeonSelect();
 
             expData = await fetchExpData();
-            initializeExpCategorySelect();
+            initializeExpDungeonSelect();
 
-            // 初期計算
             runDamageCalculation();
             calculateExp();
         }
