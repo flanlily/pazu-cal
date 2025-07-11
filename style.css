@@ -154,26 +154,23 @@ button:focus {
     display: flex;
     justify-content: center;
     margin-bottom: 20px;
-    flex-wrap: nowrap; /* 折り返さない */
-    gap: 8px;
-    overflow-x: auto; /* 幅オーバー時に横スクロール */
+    flex-wrap: nowrap;   /* 折り返さない */
+    overflow-x: hidden;  /* スクロール禁止 */
+    width: 100%;         /* 幅100%に */
+    max-width: 400px;    /* 必要なら最大幅指定 */
+    box-sizing: border-box;
 }
 
 .tab-button {
-    background: linear-gradient(90deg, #1976d2 60%, #42a5f5 100%);
-    border: none;
-    border-radius: 6px;
-    color: white;
-    cursor: pointer;
-    font-weight: bold;
-    padding: 10px 20px;
-    font-size: 1rem;
-    transition: background 0.3s;
-    user-select: none;
-
+    flex-grow: 1;        /* ボタン幅を均等に広げる */
+    flex-shrink: 1;      /* 縮めることも可能に */
+    flex-basis: 0;       /* 初期幅0で均等配分 */
+    max-width: none;     /* 最大幅制限解除 */
     white-space: nowrap; /* 文字折り返さない */
-    flex-shrink: 0;      /* ボタンの縮小禁止 */
+    padding: 10px 6px;   /* 横幅調整用にパディング少し減らす */
+    text-align: center;
 }
+
 
 .tab-button.active {
     background: linear-gradient(90deg, #1565c0 60%, #64b5f6 100%);
