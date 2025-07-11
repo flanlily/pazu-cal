@@ -257,5 +257,86 @@
             navigator.serviceWorker.register('./sw.js');
         }
     </script>
+
+<!-- ここから経験値計算機 -->
+<div id="exp-calculator">
+  <h2>獲得経験値計算</h2>
+  <label>
+    ダンジョン:
+    <select id="dungeon-select">
+      <option value="">選択してください</option>
+      <!-- ダンジョンリストはJSで追加 -->
+    </select>
+  </label>
+  <label>
+    リーダー倍率:
+    <select id="leader-rate">
+      <!-- JSで倍率を追加 -->
+    </select>
+  </label>
+  <label>
+    助っ人倍率:
+    <select id="helper-rate">
+      <!-- JSで倍率を追加 -->
+    </select>
+  </label>
+  <label>
+    ダンジョンボーナス覚醒数:
+    <input type="number" min="0" id="bonus-count" value="0" />
+  </label>
+  <button id="calc-btn">計算</button>
+  <div id="result"></div>
+</div>
+
+<script>
+// JSONデータ（例）
+const padExperienceData = {
+  "ダンジョンA": 10000,
+  "ダンジョンB": 20000,
+  "ダンジョンC": 50000
+};
+
+// ダンジョンリスト追加
+const dungeonSelect = document.getElementById('dungeon-select');
+Object.keys(padExperienceData).forEach(d => {
+  const option = document.createElement('option');
+  option.value = d;
+  option.textContent = d;
+  dungeonSelect.appendChild(option);
+});
+
+// 倍率の選択肢追加
+function addRateOptions(selectId) {
+  const select = document.getElementById(selectId);
+  for(let i=0; i<10; i++) {
+    const rate = (1.1 + i*0.1).toFixed(1);
+    const option = document.createElement('option');
+    option.value = rate;
+    option.textContent = rate;
+    select.appendChild(option);
+  }
+}
+addRateOptions('leader-rate');
+addRateOptions('helper-rate');
+
+// 計算処理
+document.getElementById('calc-btn').addEventListener('click', function() {
+  const dungeon = dungeonSelect.value;
+  const leaderRate = parseFloat(document.getElementById('leader-rate').value);
+  const helperRate = parseFloat(document.getElementById('helper-rate').value);
+  const bonusCount = parseInt(document.getElementById('bonus-count').value, 10);
+
+  if (!dungeon) {
+    document.getElementById('result').textContent = "ダンジョンを選択してください";
+    return;
+  }
+
+  const baseExp = padExperienceData[dungeon] || 0;
+  const bonusMultiplier = Math.pow(1.02, bonusCount);
+  const exp = Math.floor(baseExp * leaderRate * helperRate * bonusMultiplier);
+
+  document.getElementById('result').textContent = `獲得経験値: ${exp}`;
+});
+</script>
 </body>
 </html>
