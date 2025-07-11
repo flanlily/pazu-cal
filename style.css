@@ -154,8 +154,9 @@ button:focus {
     display: flex;
     justify-content: center;
     margin-bottom: 20px;
-    flex-wrap: nowrap; /* スマホで折り返し */
+    flex-wrap: nowrap; /* 折り返さない */
     gap: 8px;
+    overflow-x: auto; /* 幅オーバー時に横スクロール */
 }
 
 .tab-button {
@@ -169,6 +170,9 @@ button:focus {
     font-size: 1rem;
     transition: background 0.3s;
     user-select: none;
+
+    white-space: nowrap; /* 文字折り返さない */
+    flex-shrink: 0;      /* ボタンの縮小禁止 */
 }
 
 .tab-button.active {
@@ -226,8 +230,11 @@ button:focus {
         gap: 6px;
     }
     .tab-button {
-        flex-grow: 1;
+        /* flex-grow: 1; 削除して文字が折り返されないように */
         padding: 10px 8px;
         font-size: 1rem;
+
+        white-space: nowrap; /* 追加 */
+        flex-shrink: 0;
     }
 }
