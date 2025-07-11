@@ -154,7 +154,7 @@ button:focus {
     display: flex;
     justify-content: center;
     margin-bottom: 20px;
-    flex-wrap: wrap; /* スマホで折り返し */
+    flex-wrap: nowrap; /* スマホで折り返し */
     gap: 8px;
 }
 
