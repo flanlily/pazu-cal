@@ -1,133 +1,163 @@
 <!DOCTYPE html>
 <html lang="ja">
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="manifest" href="manifest.json">
-    <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
-    <meta name="theme-color" content="#1976d2">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="stylesheet" href="style.css" />
     <title>ダメージ軽減計算ツール</title>
-    <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
     <div class="container">
         <h1>ダメージ軽減計算ツール</h1>
-        <p>
-            Notebooklmを使用し作成したツールになります。<br>
-            ※NootbooklmはGoogleが提供するサービスです。<br>
-            PDCと合わせてご利用ください。<br>
-            <br>
-            7/10追記:<br>
-                一部ダンジョン追加しました。<br>
-                回復L字消し軽減, 属性軽減+に対応しました。<br>
-                計算結果をリアルタイム反映するようにしました。
-            <br>
-            7/11追記:<br>
-            経験値計算に仮対応しました。<br>
-            修正点があれば、<a href="https://x.com/sarna_flanlily" target="_blank" rel="noopener noreferrer">Xのアカウント</a>にてまでお願いします。
-        </p>
 
-        <div class="input-group">
-            <label for="dungeonSelect">ダンジョン選択:</label>
-            <select id="dungeonSelect">
-                <option value="">ダンジョンを選択してください</option>
-            </select>
+        <!-- タブボタン -->
+        <div class="tabs">
+            <button class="tab-button active" data-tab="damage">ダメージ軽減</button>
+            <button class="tab-button" data-tab="exp">経験値</button>
         </div>
 
-        <div class="input-group">
-            <label for="floorSelect">フロア選択:</label>
-            <select id="floorSelect" disabled>
-                <option value="">フロアを選択してください</option>
-            </select>
+        <!-- ダメージ軽減タブコンテンツ -->
+        <div id="damage" class="tab-content">
+            <div class="input-group">
+                <label for="dungeonSelect">ダンジョン選択:</label>
+                <select id="dungeonSelect"></select>
+            </div>
+
+            <div class="input-group">
+                <label for="floorSelect">フロア選択:</label>
+                <select id="floorSelect"></select>
+            </div>
+
+            <div class="input-group">
+                <label for="inputA">リーダー軽減率 (A) 0〜1の小数で入力</label>
+                <input type="number" id="inputA" min="0" max="1" step="0.01" value="0" />
+            </div>
+
+            <div class="input-group">
+                <label for="inputB">助っ人軽減率 (B) 0〜1の小数で入力</label>
+                <input type="number" id="inputB" min="0" max="1" step="0.01" value="0" />
+            </div>
+
+            <div class="input-group">
+                <label for="inputC">軽減スキル (C)</label>
+                <select id="inputC">
+                    <option value="0">0%</option>
+                    <option value="0.3">30%</option>
+                    <option value="0.35">35%</option>
+                    <option value="0.4">40%</option>
+                    <option value="0.5">50%</option>
+                    <option value="0.6">60%</option>
+                    <option value="0.7">70%</option>
+                    <option value="0.75">75%</option>
+                    <option value="0.8">80%</option>
+                    <option value="0.9">90%</option>
+                    <option value="1">100% (完全無効)</option>
+                </select>
+            </div>
+
+            <div class="input-group">
+                <label for="inputL">回復L字消し個数 (1個5%軽減)</label>
+                <input type="number" id="inputL" min="0" step="1" value="0" />
+            </div>
+
+            <div class="input-group">
+                <label for="inputAttr">属性軽減+個数 (1個2.5%軽減)</label>
+                <input type="number" id="inputAttr" min="0" step="1" value="0" />
+            </div>
+
+            <div id="results">
+                <h2>計算結果</h2>
+                <p id="totalReductionRate"></p>
+                <table class="results-table" id="resultsTable">
+                    <thead>
+                        <tr>
+                            <th>フロアの割合ダメージ</th>
+                            <th>最終的なHPに対するダメージ割合</th>
+                            <th>耐えれるか</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
         </div>
 
-        <div class="input-group">
-            <label for="inputA">リーダーキャラ軽減率 (A) <small>例: 0.5 (50%軽減) または 0.75 (75%軽減)</small>:</label>
-            <input type="number" id="inputA" min="0" max="1" step="0.01" value="0">
-        </div>
+        <!-- 経験値タブコンテンツ -->
+        <div id="exp" class="tab-content hidden">
+            <h2>経験値計算</h2>
 
-        <div class="input-group">
-            <label for="inputB">助っ人軽減率 (B) <small>例: 0.5 (50%軽減) または 0.75 (75%軽減)</small>:</label>
-            <input type="number" id="inputB" min="0" max="1" step="0.01" value="0">
-        </div>
+            <div class="input-group">
+                <label for="expCategory">カテゴリ選択:</label>
+                <select id="expCategory"></select>
+            </div>
 
-        <div class="input-group">
-            <label for="inputC">軽減スキル (C):</label>
-            <select id="inputC">
-                <option value="0">0%</option>
-                <option value="0.3">30%</option>
-                <option value="0.35">35%</option>
-                <option value="0.4">40%</option>
-                <option value="0.5">50%</option>
-                <option value="0.6">60%</option>
-                <option value="0.7">70%</option>
-                <option value="0.75">75%</option>
-                <option value="0.8">80%</option>
-                <option value="0.9">90%</option>
-                <option value="1">100% (完全無効)</option>
-            </select>
-        </div>
+            <div class="input-group">
+                <label for="expDungeon">ダンジョン選択:</label>
+                <select id="expDungeon" disabled></select>
+            </div>
 
-        <div class="input-group">
-            <label for="inputL">回復L字消し個数（1個5%軽減、制限なし）:</label>
-            <input type="number" id="inputL" min="0" step="1" value="0">
-        </div>
-        <div class="input-group">
-            <label for="inputAttr">属性軽減+個数（1個2.5%軽減、制限なし）:</label>
-            <input type="number" id="inputAttr" min="0" step="1" value="0">
-        </div>
+            <div class="input-group">
+                <label for="expFloor">フロア選択:</label>
+                <select id="expFloor" disabled></select>
+            </div>
 
-        <div id="results">
-            <h2>計算結果</h2>
-            <p id="totalReductionRate"></p>
-            <table class="results-table" id="resultsTable">
-                <thead>
-                    <tr>
-                        <th>フロアの割合ダメージ</th>
-                        <th>最終的なHPに対するダメージ割合</th>
-                        <th>耐えれるか</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <!-- 結果はここにJavaScriptで挿入されます -->
-                </tbody>
-            </table>
-        </div>
+            <div class="input-group">
+                <label for="leaderMultiplier">リーダー経験値倍率:</label>
+                <select id="leaderMultiplier">
+                    <option value="1.1">1.1倍</option>
+                    <option value="1.2">1.2倍</option>
+                    <option value="1.3">1.3倍</option>
+                    <option value="1.4">1.4倍</option>
+                    <option value="1.5">1.5倍</option>
+                    <option value="1.6">1.6倍</option>
+                    <option value="1.7">1.7倍</option>
+                    <option value="1.8">1.8倍</option>
+                    <option value="1.9">1.9倍</option>
+                    <option value="2.0">2.0倍</option>
+                </select>
+            </div>
 
-        <p class="note">
-            ※一個人が趣味範囲で作成したツールになります。<br>
-        </p>
+            <div class="input-group">
+                <label for="friendMultiplier">助っ人経験値倍率:</label>
+                <select id="friendMultiplier">
+                    <option value="1.1">1.1倍</option>
+                    <option value="1.2">1.2倍</option>
+                    <option value="1.3">1.3倍</option>
+                    <option value="1.4">1.4倍</option>
+                    <option value="1.5">1.5倍</option>
+                    <option value="1.6">1.6倍</option>
+                    <option value="1.7">1.7倍</option>
+                    <option value="1.8">1.8倍</option>
+                    <option value="1.9">1.9倍</option>
+                    <option value="2.0">2.0倍</option>
+                </select>
+            </div>
+
+            <div class="input-group">
+                <label for="dungeonBonusCount">ダンジョンボーナス覚醒数:</label>
+                <input type="number" id="dungeonBonusCount" min="0" step="1" value="0" />
+                <small>1つにつき2%加算され、累乗されます</small>
+            </div>
+
+            <div id="expResult">
+                <h2>経験値結果</h2>
+                <p id="expValue">-</p>
+            </div>
+        </div>
     </div>
 
     <script>
-        // ページリロード時にクッキーとローカルストレージを削除
-        window.addEventListener('load', () => {
-            // クッキー削除
-            document.cookie.split(';').forEach(function(c) {
-                const eqPos = c.indexOf('=');
-                const name = eqPos > -1 ? c.substr(0, eqPos) : c;
-                document.cookie = name + '=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/';
-            });
-            // ローカルストレージ削除
-            localStorage.clear();
-            // セッションストレージ削除
-            sessionStorage.clear();
-        });
-
-        // JSONファイルからデータを取得する関数
-        async function fetchDungeonData() {
-            // GitHub Pagesで公開する場合は、fetchのパスを相対パスにする
-            // HTMLと同じ階層にdungeonData.jsonがある場合
+        // ----------- データ読み込み関連 -----------
+        async function fetchDamageDungeonData() {
             const response = await fetch('./dungeonData.json');
             if (!response.ok) {
-                alert('ダンジョンデータの読み込みに失敗しました。');
+                alert('ダメージダンジョンデータの読み込みに失敗しました。');
                 return {};
             }
             const data = await response.json();
-            // 文字列の割合を数値配列に変換
             for (const dungeon in data) {
                 for (const floor in data[dungeon]) {
-                    // もし値が配列でなく文字列なら分割
                     if (typeof data[dungeon][floor] === 'string') {
                         data[dungeon][floor] = data[dungeon][floor]
                             .split(',')
@@ -139,38 +169,77 @@
             return data;
         }
 
-        // HTML要素の取得
+        async function fetchExpData() {
+            const response = await fetch('./pad_experience_data.json');
+            if (!response.ok) {
+                alert('経験値データの読み込みに失敗しました。');
+                return {};
+            }
+            const data = await response.json();
+            return data;
+        }
+
+        // ----------- HTML要素 -----------
         const dungeonSelect = document.getElementById('dungeonSelect');
         const floorSelect = document.getElementById('floorSelect');
         const inputA = document.getElementById('inputA');
         const inputB = document.getElementById('inputB');
         const inputC = document.getElementById('inputC');
-        const inputL = document.getElementById('inputL'); // 回復L字
-        const inputAttr = document.getElementById('inputAttr'); // 属性軽減+個数
+        const inputL = document.getElementById('inputL');
+        const inputAttr = document.getElementById('inputAttr');
         const totalReductionRateDisplay = document.getElementById('totalReductionRate');
         const resultsTableBody = document.querySelector('#resultsTable tbody');
 
-        let dungeonData = {};
+        const expCategory = document.getElementById('expCategory');
+        const expDungeon = document.getElementById('expDungeon');
+        const expFloor = document.getElementById('expFloor');
+        const leaderMultiplier = document.getElementById('leaderMultiplier');
+        const friendMultiplier = document.getElementById('friendMultiplier');
+        const dungeonBonusCount = document.getElementById('dungeonBonusCount');
+        const expValueDisplay = document.getElementById('expValue');
 
-        // ページロード時にダンジョン選択肢を初期化する関数
-        function initializeDungeonSelect() {
+        const tabs = document.querySelectorAll('.tab-button');
+        const tabContents = document.querySelectorAll('.tab-content');
+
+        let damageDungeonData = {};
+        let expData = {};
+
+        // ----------- タブ切り替え処理 -----------
+        tabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                tabs.forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+
+                tabContents.forEach(tc => {
+                    if (tc.id === tab.dataset.tab) {
+                        tc.classList.remove('hidden');
+                    } else {
+                        tc.classList.add('hidden');
+                    }
+                });
+            });
+        });
+
+        // ----------- ダメージ軽減処理 -----------
+        function initializeDamageDungeonSelect() {
             dungeonSelect.innerHTML = '<option value="">ダンジョンを選択してください</option>';
-            for (const dungeonName in dungeonData) {
+            for (const dungeonName in damageDungeonData) {
                 const option = document.createElement('option');
                 option.value = dungeonName;
                 option.textContent = dungeonName;
                 dungeonSelect.appendChild(option);
             }
+            floorSelect.innerHTML = '<option value="">フロアを選択してください</option>';
+            floorSelect.disabled = true;
         }
 
-        // ダンジョン選択時にフロア選択肢を更新するイベントリスナー
         dungeonSelect.addEventListener('change', () => {
             const selectedDungeon = dungeonSelect.value;
             floorSelect.innerHTML = '<option value="">フロアを選択してください</option>';
             floorSelect.disabled = true;
 
-            if (selectedDungeon && dungeonData[selectedDungeon]) {
-                const floors = dungeonData[selectedDungeon];
+            if (selectedDungeon && damageDungeonData[selectedDungeon]) {
+                const floors = damageDungeonData[selectedDungeon];
                 for (const floorName in floors) {
                     const option = document.createElement('option');
                     option.value = floorName;
@@ -179,17 +248,23 @@
                 }
                 floorSelect.disabled = false;
             }
+            runDamageCalculation();
         });
 
-        // 計算処理本体を関数化
-        function runCalculation() {
+        floorSelect.addEventListener('change', runDamageCalculation);
+        [inputA, inputB, inputC, inputL, inputAttr].forEach(el => {
+            el.addEventListener('input', runDamageCalculation);
+            el.addEventListener('change', runDamageCalculation);
+        });
+
+        function runDamageCalculation() {
             const selectedDungeon = dungeonSelect.value;
             const selectedFloor = floorSelect.value;
             const valA = parseFloat(inputA.value);
             const valB = parseFloat(inputB.value);
             const valC = parseFloat(inputC.value);
-            const valL = parseInt(inputL.value) || 0; // L字個数
-            const valAttr = parseInt(inputAttr.value) || 0; // 属性軽減+個数
+            const valL = parseInt(inputL.value) || 0;
+            const valAttr = parseInt(inputAttr.value) || 0;
 
             if (!selectedDungeon || !selectedFloor) {
                 totalReductionRateDisplay.textContent = '';
@@ -197,150 +272,186 @@
                 return;
             }
             if (isNaN(valA) || isNaN(valB)) {
-                totalReductionRateDisplay.textContent = 'リーダーキャラ軽減率と助っ人軽減率は数値で入力してください。';
+                totalReductionRateDisplay.textContent = 'リーダー軽減率と助っ人軽減率は数値で入力してください。';
                 resultsTableBody.innerHTML = '';
                 return;
             }
-            if (valL < 0) {
-                totalReductionRateDisplay.textContent = '回復L字消し個数は0以上で入力してください。';
-                resultsTableBody.innerHTML = '';
-                return;
-            }
-            if (valAttr < 0) {
-                totalReductionRateDisplay.textContent = '属性軽減+個数は0以上で入力してください。';
+            if (valL < 0 || valAttr < 0) {
+                totalReductionRateDisplay.textContent = '個数は0以上で入力してください。';
                 resultsTableBody.innerHTML = '';
                 return;
             }
 
-            const lReduction = valL * 0.05; // 制限なし
-            const attrReduction = valAttr * 0.025; // 制限なし
-            const finalDamageMultiplier = (1 - valA) * (1 - valB) * (1 - valC) * (1 - lReduction) * (1 - attrReduction);
-            const totalReduction = 1 - finalDamageMultiplier;
+            // 軽減率計算
+            // (1 - A) * (1 - B) * (1 - C) * (1 - 0.05 * L) * (1 - 0.025 * attr)
+            const leaderReduce = 1 - valA;
+            const friendReduce = 1 - valB;
+            const skillReduce = 1 - valC;
+            const lReduce = 1 - 0.05 * valL;
+            const attrReduce = 1 - 0.025 * valAttr;
 
-            totalReductionRateDisplay.textContent = `入力された軽減率による最終的な被ダメージ倍率: ${(finalDamageMultiplier * 100).toFixed(2)}% （合計軽減率: ${(totalReduction * 100).toFixed(2)}%）\n回復L字軽減率: ${(lReduction * 100).toFixed(0)}%　属性軽減+: ${(attrReduction * 100).toFixed(1)}%`;
+            let totalReduce = leaderReduce * friendReduce * skillReduce * lReduce * attrReduce;
+            totalReduce = Math.max(0, Math.min(1, totalReduce)); // 0〜1に制限
 
-            const floorPercentages = dungeonData[selectedDungeon][selectedFloor];
+            const totalReducePercent = ((1 - totalReduce) * 100).toFixed(2);
+
+            totalReductionRateDisplay.textContent = `総軽減率: ${totalReducePercent}%`;
+
+            // フロアの割合ダメージごとに最終ダメージを計算し表示
+            const damageRatios = damageDungeonData[selectedDungeon][selectedFloor];
 
             resultsTableBody.innerHTML = '';
 
-            floorPercentages.forEach(percentage => {
-                const actualDamageRatio = (percentage / 100) * finalDamageMultiplier;
-                const canWithstand = actualDamageRatio < 1;
+            damageRatios.forEach(ratio => {
+                const finalDamage = ratio / 100 * totalReduce; // 0〜1の割合
+                const finalDamagePercent = (finalDamage * 100).toFixed(2) + '%';
 
-                const row = resultsTableBody.insertRow();
-                const cell1 = row.insertCell(0);
-                const cell2 = row.insertCell(1);
-                const cell3 = row.insertCell(2);
+                const canWithstand = finalDamage <= 1; // HP1として耐えられるか
 
-                cell1.textContent = `${percentage}%`;
-                cell2.textContent = `${(actualDamageRatio * 100).toFixed(2)}%`;
+                const tr = document.createElement('tr');
+                const tdRatio = document.createElement('td');
+                tdRatio.textContent = ratio + '%';
 
-                if (canWithstand) {
-                    cell3.textContent = '耐えれる ✅';
-                    cell3.classList.add('can-withstand');
-                } else {
-                    cell3.textContent = '耐えれない ❌';
-                    cell3.classList.add('cannot-withstand');
-                }
+                const tdFinal = document.createElement('td');
+                tdFinal.textContent = finalDamagePercent;
+
+                const tdCan = document.createElement('td');
+                tdCan.textContent = canWithstand ? '耐えられる' : '耐えられない';
+                tdCan.className = canWithstand ? 'can-withstand' : 'cannot-withstand';
+
+                tr.appendChild(tdRatio);
+                tr.appendChild(tdFinal);
+                tr.appendChild(tdCan);
+
+                resultsTableBody.appendChild(tr);
             });
         }
 
-        // ページが完全に読み込まれた後にJSONを読み込んで初期化
-        window.addEventListener('DOMContentLoaded', async () => {
-            dungeonData = await fetchDungeonData();
-            initializeDungeonSelect();
-        });
-
-        // 各入力欄・セレクトボックスの変更時に計算を実行
-        [dungeonSelect, floorSelect, inputA, inputB, inputC, inputL, inputAttr].forEach(el => {
-            el.addEventListener('input', runCalculation);
-            el.addEventListener('change', runCalculation);
-        });
-
-        if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('./sw.js');
+        // ----------- 経験値計算処理 -----------
+        function initializeExpCategorySelect() {
+            expCategory.innerHTML = '<option value="">カテゴリを選択してください</option>';
+            for (const category in expData) {
+                const option = document.createElement('option');
+                option.value = category;
+                option.textContent = category;
+                expCategory.appendChild(option);
+            }
+            expDungeon.innerHTML = '<option value="">ダンジョンを選択してください</option>';
+            expDungeon.disabled = true;
+            expFloor.innerHTML = '<option value="">フロアを選択してください</option>';
+            expFloor.disabled = true;
         }
+
+        expCategory.addEventListener('change', () => {
+            const selectedCategory = expCategory.value;
+            expDungeon.innerHTML = '<option value="">ダンジョンを選択してください</option>';
+            expDungeon.disabled = true;
+            expFloor.innerHTML = '<option value="">フロアを選択してください</option>';
+            expFloor.disabled = true;
+            expValueDisplay.textContent = '-';
+
+            if (selectedCategory && expData[selectedCategory]) {
+                const dungeons = expData[selectedCategory];
+                for (const dungeonName in dungeons) {
+                    const option = document.createElement('option');
+                    option.value = dungeonName;
+                    option.textContent = dungeonName;
+                    expDungeon.appendChild(option);
+                }
+                expDungeon.disabled = false;
+            }
+        });
+
+        expDungeon.addEventListener('change', () => {
+            const selectedCategory = expCategory.value;
+            const selectedDungeon = expDungeon.value;
+            expFloor.innerHTML = '<option value="">フロアを選択してください</option>';
+            expFloor.disabled = true;
+            expValueDisplay.textContent = '-';
+
+            if (selectedCategory && selectedDungeon && expData[selectedCategory][selectedDungeon]) {
+                const floors = expData[selectedCategory][selectedDungeon];
+                if (typeof floors === 'object' && floors !== null && !Array.isArray(floors)) {
+                    // フロアがある場合
+                    for (const floorName in floors) {
+                        const option = document.createElement('option');
+                        option.value = floorName;
+                        option.textContent = floorName;
+                        expFloor.appendChild(option);
+                    }
+                    expFloor.disabled = false;
+                } else {
+                    // フロア無し＝配列or数値
+                    expFloor.innerHTML = '<option value="none">-</option>';
+                    expFloor.disabled = true;
+                }
+            }
+        });
+
+        expFloor.addEventListener('change', calculateExp);
+        leaderMultiplier.addEventListener('change', calculateExp);
+        friendMultiplier.addEventListener('change', calculateExp);
+        dungeonBonusCount.addEventListener('input', calculateExp);
+
+        function calculateExp() {
+            const category = expCategory.value;
+            const dungeon = expDungeon.value;
+            const floor = expFloor.value;
+            const leaderMul = parseFloat(leaderMultiplier.value);
+            const friendMul = parseFloat(friendMultiplier.value);
+            const bonusCount = parseInt(dungeonBonusCount.value) || 0;
+
+            if (!category || !dungeon) {
+                expValueDisplay.textContent = '-';
+                return;
+            }
+
+            let baseExp;
+
+            if (floor && floor !== 'none') {
+                if (
+                    expData[category] &&
+                    expData[category][dungeon] &&
+                    expData[category][dungeon][floor] !== undefined
+                ) {
+                    baseExp = expData[category][dungeon][floor];
+                } else {
+                    baseExp = 0;
+                }
+            } else {
+                if (Array.isArray(expData[category][dungeon])) {
+                    baseExp = expData[category][dungeon].reduce((a, b) => a + b, 0);
+                } else if (typeof expData[category][dungeon] === 'number') {
+                    baseExp = expData[category][dungeon];
+                } else {
+                    baseExp = 0;
+                }
+            }
+
+            // ダンジョンボーナス覚醒は1つにつき2%加算されて乗算
+            const bonusMultiplier = Math.pow(1.02, bonusCount);
+
+            // 経験値倍率計算（切り捨て）
+            let expResult = Math.floor(baseExp * leaderMul * friendMul * bonusMultiplier);
+
+            expValueDisplay.textContent = `経験値: ${expResult.toLocaleString()}（ベース: ${baseExp.toLocaleString()}）`;
+        }
+
+        // ----------- 初期化処理 -----------
+        async function initialize() {
+            damageDungeonData = await fetchDamageDungeonData();
+            initializeDamageDungeonSelect();
+
+            expData = await fetchExpData();
+            initializeExpCategorySelect();
+
+            // 初期計算
+            runDamageCalculation();
+            calculateExp();
+        }
+
+        window.addEventListener('DOMContentLoaded', initialize);
     </script>
-
-<!-- ここから経験値計算機 -->
-<div id="exp-calculator">
-  <h2>獲得経験値計算</h2>
-  <label>
-    ダンジョン:
-    <select id="dungeon-select">
-      <option value="">選択してください</option>
-      <!-- ダンジョンリストはJSで追加 -->
-    </select>
-  </label>
-  <label>
-    リーダー倍率:
-    <select id="leader-rate">
-      <!-- JSで倍率を追加 -->
-    </select>
-  </label>
-  <label>
-    助っ人倍率:
-    <select id="helper-rate">
-      <!-- JSで倍率を追加 -->
-    </select>
-  </label>
-  <label>
-    ダンジョンボーナス覚醒数:
-    <input type="number" min="0" id="bonus-count" value="0" />
-  </label>
-  <button id="calc-btn">計算</button>
-  <div id="result"></div>
-</div>
-
-<script>
-// JSONデータ（例）
-const padExperienceData = {
-  "ダンジョンA": 10000,
-  "ダンジョンB": 20000,
-  "ダンジョンC": 50000
-};
-
-// ダンジョンリスト追加
-const dungeonSelect = document.getElementById('dungeon-select');
-Object.keys(padExperienceData).forEach(d => {
-  const option = document.createElement('option');
-  option.value = d;
-  option.textContent = d;
-  dungeonSelect.appendChild(option);
-});
-
-// 倍率の選択肢追加
-function addRateOptions(selectId) {
-  const select = document.getElementById(selectId);
-  for(let i=0; i<10; i++) {
-    const rate = (1.1 + i*0.1).toFixed(1);
-    const option = document.createElement('option');
-    option.value = rate;
-    option.textContent = rate;
-    select.appendChild(option);
-  }
-}
-addRateOptions('leader-rate');
-addRateOptions('helper-rate');
-
-// 計算処理
-document.getElementById('calc-btn').addEventListener('click', function() {
-  const dungeon = dungeonSelect.value;
-  const leaderRate = parseFloat(document.getElementById('leader-rate').value);
-  const helperRate = parseFloat(document.getElementById('helper-rate').value);
-  const bonusCount = parseInt(document.getElementById('bonus-count').value, 10);
-
-  if (!dungeon) {
-    document.getElementById('result').textContent = "ダンジョンを選択してください";
-    return;
-  }
-
-  const baseExp = padExperienceData[dungeon] || 0;
-  const bonusMultiplier = Math.pow(1.02, bonusCount);
-  const exp = Math.floor(baseExp * leaderRate * helperRate * bonusMultiplier);
-
-  document.getElementById('result').textContent = `獲得経験値: ${exp}`;
-});
-</script>
 </body>
+
 </html>
