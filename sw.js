@@ -5,7 +5,8 @@ self.addEventListener('install', function(e) {
         './',
         './index.html',
         './style.css',
-        './dungeonData.json'
+        './dungeonData.json',
+        './pad_experience_data.json'
       ]);
     })
   );
