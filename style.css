@@ -174,7 +174,7 @@ button:focus {
 
 .tab-button.active {
     background: linear-gradient(90deg, #1565c0 60%, #64b5f6 100%);
-    box-shadow: 0 0 10px #64b5f6;
+    box-shadow: none;
 }
 
 .tab-button:focus {
