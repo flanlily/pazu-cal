@@ -7,7 +7,9 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
+    padding: 12px; /* 画面端での余白確保 */
 }
+
 .container {
     max-width: 95vw;
     width: 100%;
@@ -19,7 +21,9 @@ body {
     display: flex;
     flex-direction: column;
     align-items: center;
+    box-sizing: border-box; /* 安定のため */
 }
+
 h1, h2 {
     color: #e3f2fd;
     border-bottom: 2px solid #1976d2;
@@ -27,21 +31,28 @@ h1, h2 {
     margin-bottom: 18px;
     width: 100%;
     text-align: center;
+    word-break: break-word; /* 長いタイトル対策 */
 }
+
 p, label, .note {
     color: #e3f2fd;
 }
+
 .input-group {
     margin-bottom: 14px;
     width: 100%;
     max-width: 400px;
+    box-sizing: border-box;
 }
+
 .input-group label {
     display: block;
     margin-bottom: 4px;
     font-weight: bold;
     color: #bbdefb;
+    word-break: break-word; /* ラベル長文対応 */
 }
+
 .input-group select,
 .input-group input[type="number"] {
     width: 100%;
@@ -56,10 +67,12 @@ p, label, .note {
     outline: none;
     transition: border-color 0.2s;
 }
+
 .input-group select:focus,
 .input-group input[type="number"]:focus {
     border-color: #1976d2;
 }
+
 button {
     background: linear-gradient(90deg, #1976d2 60%, #42a5f5 100%);
     color: #fff;
@@ -74,10 +87,15 @@ button {
     max-width: 400px;
     margin-top: 10px;
     box-shadow: 0 2px 8px rgba(33,150,243,0.12);
+    user-select: none;
 }
-button:hover {
+
+button:hover,
+button:focus {
     background: linear-gradient(90deg, #1565c0 60%, #64b5f6 100%);
+    outline: none;
 }
+
 .results-table {
     width: 100%;
     max-width: 400px;
@@ -89,28 +107,35 @@ button:hover {
     overflow: hidden;
     font-size: 15px;
 }
-.results-table th, .results-table td {
+
+.results-table th,
+.results-table td {
     border: 1px solid #90caf9;
     padding: 8px;
     text-align: center;
-    word-break: break-all;
+    word-break: break-word;
 }
+
 .results-table th {
     background: #bbdefb;
     color: #0d47a1;
     font-weight: bold;
 }
+
 .results-table tr:nth-child(even) {
     background: #e3f2fd;
 }
+
 .results-table .can-withstand {
     color: #2e7d32;
     font-weight: bold;
 }
+
 .results-table .cannot-withstand {
     color: #c62828;
     font-weight: bold;
 }
+
 .note {
     font-size: 0.92em;
     color: #b3e5fc;
@@ -121,29 +146,88 @@ button:hover {
     max-width: 400px;
     text-align: left;
     background: none;
+    box-sizing: border-box;
 }
+
+/* 追加：タブボタン */
+.tabs {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 20px;
+    flex-wrap: wrap; /* スマホで折り返し */
+    gap: 8px;
+}
+
+.tab-button {
+    background: linear-gradient(90deg, #1976d2 60%, #42a5f5 100%);
+    border: none;
+    border-radius: 6px;
+    color: white;
+    cursor: pointer;
+    font-weight: bold;
+    padding: 10px 20px;
+    font-size: 1rem;
+    transition: background 0.3s;
+    user-select: none;
+}
+
+.tab-button.active {
+    background: linear-gradient(90deg, #1565c0 60%, #64b5f6 100%);
+    box-shadow: 0 0 10px #64b5f6;
+}
+
+.tab-button:focus {
+    outline: 2px solid #64b5f6;
+}
+
+/* タブコンテンツの表示・非表示 */
+.tab-content.hidden {
+    display: none;
+}
+
+/* ------------------ スマホ用メディアクエリ ------------------ */
 @media (max-width: 600px) {
+    body {
+        padding: 8px;
+    }
     .container {
-        padding: 8px 2vw 18px 2vw;
-        border-radius: 0;
-        min-height: 100vh;
-        box-shadow: none;
+        padding: 16px 4vw 24px 4vw;
+        border-radius: 12px;
+        min-height: auto;
+        box-shadow: 0 2px 12px rgba(0,0,0,0.14);
     }
     h1, h2 {
-        font-size: 1.2em;
-        padding-bottom: 5px;
-        margin-bottom: 12px;
+        font-size: 1.3em;
+        padding-bottom: 6px;
+        margin-bottom: 14px;
     }
-    .input-group, .results-table, .note {
-        max-width: 98vw;
+    .input-group,
+    .results-table,
+    .note {
+        max-width: 100%;
         font-size: 1em;
     }
-    .results-table th, .results-table td {
-        font-size: 0.95em;
-        padding: 6px;
+    .input-group select,
+    .input-group input[type="number"] {
+        font-size: 16px;
+        padding: 8px;
+    }
+    .results-table th,
+    .results-table td {
+        font-size: 0.9em;
+        padding: 6px 4px;
     }
     button {
-        font-size: 1em;
-        padding: 11px 0;
+        font-size: 1.1em;
+        padding: 12px 0;
+        max-width: 100%;
+    }
+    .tabs {
+        gap: 6px;
+    }
+    .tab-button {
+        flex-grow: 1;
+        padding: 10px 8px;
+        font-size: 1rem;
     }
 }
