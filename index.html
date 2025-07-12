@@ -300,14 +300,15 @@
             resultsTableBody.innerHTML = '';
 
             damageRatios.forEach(ratio => {
-                // 正しい割合計算: ダメージ割合 = ratio * (1 - 総軽減率) / 100
-                const finalDamageRatio = ratio * (1 - totalReduce) / 100;
-                const canSurvive = finalDamageRatio < 1 ? '耐えられる' : '耐えられない';
+                // ratioは「%」表記の数値
+                // ダメージ割合 = ratio × (1 - 総軽減率)
+                const finalDamagePercent = (ratio * (1 - totalReduce)).toFixed(2);
+                const canSurvive = finalDamagePercent < 100 ? '耐えられる' : '耐えられない';
 
                 const tr = document.createElement('tr');
                 tr.innerHTML = `
                     <td>${ratio}%</td>
-                    <td>${(finalDamageRatio * 100).toFixed(2)}%</td>
+                    <td>${finalDamagePercent}%</td>
                     <td class="${canSurvive === '耐えられる' ? 'can-withstand' : 'cannot-withstand'}">${canSurvive}</td>
                 `;
                 resultsTableBody.appendChild(tr);
