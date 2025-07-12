@@ -13,6 +13,10 @@
 <div class="container">
 <h1>PDC非対応計算ツール</h1>
 <p>
+            Notebooklmを使用し作成したツールになります。<br/>
+            ※NootbooklmはGoogleが提供するサービスです。<br/>
+            PDCと合わせてご利用ください。<br/>
+<br/>
             7/10追記:<br/>
                 一部ダンジョン追加しました。<br/>
                 回復L字消し軽減, 属性軽減+に対応しました。<br/>
@@ -20,9 +24,7 @@
             7/11追記:<br/>
                 経験値計算に仮対応しました。<br/>
                 細かいブラッシュアップをしました。<br/>
-                不具合等あれば、<a class="custom-link" href="https://x.com/sarna_flanlily" rel="noopener noreferrer" target="_blank">Xのアカウント</a>までお願いします。<br/>
-            7/12追記:<br/>
-                クエストダンジョンLv EXに対応しました。
+                不具合等あれば、<a class="custom-link" href="https://x.com/sarna_flanlily" rel="noopener noreferrer" target="_blank">Xのアカウント</a>までお願いします。
         </p>
 <!-- タブボタン -->
 <div class="tabs">
@@ -401,54 +403,84 @@ damageRatios.forEach(ratio => {
         }
 
         // ----------- 初期化処理 -----------
-        (async () => {
+            async function initializeAll() {
+        // キャッシュ・ストレージのクリア（必要に応じて）
+           localStorage.clear();
+           sessionStorage.clear();
+
+        // データの再取得
             damageDungeonData = await fetchDamageDungeonData();
             initializeDamageDungeonSelect();
 
             expData = await fetchExpData();
             initializeExpDungeonSelect();
-        })();
-    
-    function updateResults() {
-        const valA = parseFloat(document.getElementById('leader-reduce').value) || 0;
-        const valB = parseFloat(document.getElementById('friend-reduce').value) || 0;
-        const valC = parseFloat(document.getElementById('skill-reduce').value) || 0;
-        const valL = parseFloat(document.getElementById('l-value').value) || 0;
-        const valAttr = parseFloat(document.getElementById('attr-value').value) || 0;
+            
+        // 入力欄の初期化
+            ['leader-reduce', 'friend-reduce', 'skill-reduce', 'l-value', 'attr-value'].forEach(id => {
+            const input = document.getElementById(id);
+            if (input) input.value = '';
+        });
 
-        const leaderReduce = 1 - valA;
-        const friendReduce = 1 - valB;
-        const skillReduce = 1 - valC;
-        const lReduce = 1 - 0.05 * valL;
-        const attrReduce = 1 - 0.025 * valAttr;
+        updateResults();
+    }
 
-    let totalReduce = leaderReduce * friendReduce * skillReduce * lReduce * attrReduce;
-    totalReduce = Math.max(0, Math.min(1, totalReduce));
+        // 初回実行
+            initializeAll();
 
-    const totalReducePercent = ((1 - totalReduce) * 100).toFixed(2);
-    document.getElementById('total-reduction').textContent = `総軽減率: ${totalReducePercent}%`;
+        // ----------- 日付変更検知処理 -----------
+            let currentDate = new Date().toDateString();
 
-    const selectedDungeon = document.getElementById('dungeon').value;
-    const selectedFloor = document.getElementById('floor').value;
-    const damageRatios = damageDungeonData[selectedDungeon][selectedFloor];
+            setInterval(() => {
+                const now = new Date().toDateString();
+                if (now !== currentDate) {
+                    currentDate = now;
+                    console.log("日付が変わりました。初期化処理を再実行します。");
+                    initializeAll();
+                }
+            }, 60 * 1000); // 1分ごとにチェック
 
-    const resultsTableBody = document.getElementById('result-table').getElementsByTagName('tbody')[0];
-    resultsTableBody.innerHTML = '';
+        // ----------- 結果更新処理 -----------
+            function updateResults() {
+                const valA = parseFloat(document.getElementById('leader-reduce').value) || 0;
+                const valB = parseFloat(document.getElementById('friend-reduce').value) || 0;
+                const valC = parseFloat(document.getElementById('skill-reduce').value) || 0;
+                const valL = parseFloat(document.getElementById('l-value').value) || 0;
+                const valAttr = parseFloat(document.getElementById('attr-value').value) || 0;
 
-    damageRatios.forEach(ratio => {
-        const finalDamagePercent = totalReduce === 0 ? ratio.toFixed(2) : (ratio * (1 - totalReduce)).toFixed(2);
-        const canSurvive = finalDamagePercent < 100 ? '耐えられる' : '耐えられない';
+                const leaderReduce = 1 - valA;
+                const friendReduce = 1 - valB;
+                const skillReduce = 1 - valC;
+                const lReduce = 1 - 0.05 * valL;
+                const attrReduce = 1 - 0.025 * valAttr;
 
-        const tr = document.createElement('tr');
-        tr.innerHTML = `
-            <td>${ratio}%</td>
-            <td>${finalDamagePercent}%</td>
-            <td class="${canSurvive === '耐えられる' ? 'can-withstand' : 'cannot-withstand'}">${canSurvive}</td>
-        `;
-        resultsTableBody.appendChild(tr);
-    });
+                let totalReduce = leaderReduce * friendReduce * skillReduce * lReduce * attrReduce;
+                totalReduce = Math.max(0, Math.min(1, totalReduce));
+
+                const totalReducePercent = ((1 - totalReduce) * 100).toFixed(2);
+                document.getElementById('total-reduction').textContent = `総軽減率: ${totalReducePercent}%`;
+
+                const selectedDungeon = document.getElementById('dungeon').value;
+                const selectedFloor = document.getElementById('floor').value;
+                const damageRatios = damageDungeonData[selectedDungeon][selectedFloor];
+
+                const resultsTableBody = document.getElementById('result-table').getElementsByTagName('tbody')[0];
+                resultsTableBody.innerHTML = '';
+
+            damageRatios.forEach(ratio => {
+                const finalDamagePercent = totalReduce === 0 ? ratio.toFixed(2) : (ratio * totalReduce).toFixed(2);
+                const canSurvive = finalDamagePercent < 100 ? '耐えられる' : '耐えられない';
+
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                <td>${ratio}%</td>
+                <td>${finalDamagePercent}%</td>
+                <td class="${canSurvive === '耐えられる' ? 'can-withstand' : 'cannot-withstand'}">${canSurvive}</td>
+                `;
+                resultsTableBody.appendChild(tr);
+            });
 }
 
+// ----------- イベントリスナー登録 -----------
 ['leader-reduce', 'friend-reduce', 'skill-reduce', 'l-value', 'attr-value', 'dungeon', 'floor'].forEach(id => {
     const element = document.getElementById(id);
     if (element) {
@@ -458,6 +490,7 @@ damageRatios.forEach(ratio => {
 });
 
 window.addEventListener('DOMContentLoaded', updateResults);
+
 </script>
 
 </body>
