@@ -303,21 +303,25 @@
     const totalReducePercent = ((1 - totalReduce) * 100).toFixed(2);
     totalReductionRateDisplay.textContent = `総軽減率: ${totalReducePercent}%`;
 
-    // ダメージ軽減後のダメージを表示
-    const damageRatios = damageDungeonData[selectedDungeon][selectedFloor];
+    
+// ダメージ軽減後のダメージを表示
+const damageRatios = damageDungeonData[selectedDungeon][selectedFloor];
 
-    damageRatios.forEach(ratio => {
-        const finalDamagePercent = totalReduce === 1 ? ratio.toFixed(2) : (ratio * (1 - totalReduce)).toFixed(2);
-        const canSurvive = finalDamagePercent < 100 ? '耐えられる' : '耐えられない';
+damageRatios.forEach(ratio => {
+    // ratio は元のダメージ割合（例：100%）
+    // totalReduce は「残りダメージ倍率」なので、ratio * totalReduce が正しい
+    const finalDamagePercent = totalReduce === 1 ? ratio.toFixed(2) : (ratio * totalReduce).toFixed(2);
+    const canSurvive = finalDamagePercent < 100 ? '耐えられる' : '耐えられない';
 
-        const tr = document.createElement('tr');
-        tr.innerHTML = `
-            <td>${ratio}%</td>
-            <td>${finalDamagePercent}%</td>
-            <td class="${canSurvive === '耐えられる' ? 'can-withstand' : 'cannot-withstand'}">${canSurvive}</td>
-        `;
-        resultsTableBody.appendChild(tr);
-    });
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+        <td>${ratio}%</td>
+        <td>${finalDamagePercent}%</td>
+        <td class="${canSurvive === '耐えられる' ? 'can-withstand' : 'cannot-withstand'}">${canSurvive}</td>
+    `;
+    resultsTableBody.appendChild(tr);
+});
+
 }
 
 
